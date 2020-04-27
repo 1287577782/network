@@ -1,5 +1,5 @@
 #pragma once
-typedef struct _DNSHeader
+typedef struct
 {
     unsigned short id;       // identification number
     unsigned char rd :1;     // recursion desired
