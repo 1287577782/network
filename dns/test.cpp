@@ -55,20 +55,18 @@ int main(int argc ,char **argv)
     len=sendto(clientfd,buf,sizeof(DNSHeader)+2+sizeof(DNSQuery)+strlen(argv[1]),0,(struct sockaddr *)&serveraddr,sizeof(serveraddr));
     i=sizeof(struct sockaddr_in);
     len=recvfrom(clientfd,buf,BUF_SIZE,0,(struct sockaddr*)&serveraddr,(socklen_t *)&i);
+    printf("len:%d\n",len);
     if(len<0)
     {
         printf("recv error, errno:%d\n",errno);
         return -1;
     }
-    if(head->ans_count==0)
-    {
-        printf("answer error\n");
-        return -1;
-    }
-    
-
-
-
-
+    // if(head->ans_count==0)
+    // {
+    //     printf("answer error\n");
+    //     return -1;
+    // }
+    p=buf+len-4;
+    printf("%s ==> %u.%u.%u.%u\n", argv[1], (unsigned char)*p, (unsigned char)*(p + 1), (unsigned char)*(p + 2), (unsigned char)*(p + 3));
     return 0;
 }
