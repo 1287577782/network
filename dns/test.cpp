@@ -57,8 +57,15 @@ int main(int argc ,char **argv)
     len=recvfrom(clientfd,buf,BUF_SIZE,0,(struct sockaddr*)&serveraddr,(socklen_t *)&i);
     if(len<0)
     {
-        
+        printf("recv error, errno:%d\n",errno);
+        return -1;
     }
+    if(head->ans_count==0)
+    {
+        printf("answer error\n");
+        return -1;
+    }
+    
 
 
 
