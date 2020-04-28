@@ -9,7 +9,7 @@
 #include "dns.h"
 #define BUF_SIZE 1024
 #define SER_PORT 53
-const char srvip[]="8.8.8.8";
+const char srvip[]="101.226.4.6";
 int main(int argc ,char **argv)
 {
     char buf[BUF_SIZE];
@@ -27,33 +27,35 @@ int main(int argc ,char **argv)
     memset(buf,0,BUF_SIZE);
 
     DNSHeader * head = (DNSHeader *)buf;
-    head->id=(unsigned short )1;
-    head->rd=1;
-    head->ra=1;
+    head->id=htons(1234);
+    head->flags=htons(0x0100);
     head->q_count=htons(1);
     strcpy(buf+sizeof(DNSHeader)+1,argv[1]);
     char *p = nullptr;
-    p=buf+sizeof(DNSHeader)+1;
-    while (p < ( buf +sizeof(DNSHeader)+strlen(argv[1]) ))
+    p=&buf[0]+sizeof(DNSHeader)+1;
+    while (p < ( buf +sizeof(DNSHeader)+1+strlen(argv[1]) ))
     {
         if( *p == '.')
         {
-            *(p-i-1)=i;
+            *(p-i-1)=char(i);
             i=0;
         }
-        else
+        else  
         {
             i++;
         }
         p++;
     }
-    *(p-i-1)=i;
+    *(p-i-1)=char(i);
+    *(p+1)='\0';
+    printf("%d\n",int('\001'));
 
     DNSQuery * dnsqurey=(DNSQuery *) (buf+sizeof(DNSHeader)+2+strlen(argv[1]));
     dnsqurey->classes=htons(1);
     dnsqurey->type=htons(1);
     len=sendto(clientfd,buf,sizeof(DNSHeader)+2+sizeof(DNSQuery)+strlen(argv[1]),0,(struct sockaddr *)&serveraddr,sizeof(serveraddr));
     i=sizeof(struct sockaddr_in);
+    memset(buf,0,BUF_SIZE);
     len=recvfrom(clientfd,buf,BUF_SIZE,0,(struct sockaddr*)&serveraddr,(socklen_t *)&i);
     printf("len:%d\n",len);
     if(len<0)
